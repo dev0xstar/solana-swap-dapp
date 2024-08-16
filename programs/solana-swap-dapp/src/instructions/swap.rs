@@ -61,3 +61,38 @@ pub fn swap(
     Ok(())
 }
 
+
+#[derive(Accounts)]
+pub struct Swap<'info> {
+    #[account(mut)]
+    pub user: Signer<'info>,
+
+    #[account(
+        mut,
+        seeds = [CONTROLLER_PDA_SEED, token_mint.key().as_ref(), controller.id.as_ref()], bump = controller.bump
+    )]
+    pub controller: Account<'info, Controller>,
+    pub token_mint: Account<'info, Mint>,
+    pub system_program: Program<'info, System>,
+
+    #[account(
+        mut,
+        seeds = [ESCROW_PDA_SEED, token_mint.key().as_ref(), controller.id.as_ref()], bump = controller.escrow_bump
+    )]
+    pub escrow: Account<'info, TokenAccount>,
+
+    #[account(
+        init_if_needed,
+        payer = user,
+        associated_token::mint = token_mint,
+        associated_token::authority = user,
+    )]
+    pub user_token_account: Account<'info, TokenAccount>,
+    
+    /// CHECK: This is not dangerous
+    pub token_program: AccountInfo<'info>,
+
+    pub rent: Sysvar<'info, Rent>,
+    /// CHECK: This is not dangerous because we don't read or write from this account
+    pub associated_token_program: AccountInfo<'info>,
+}
