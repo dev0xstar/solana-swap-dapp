@@ -35,3 +35,34 @@ pub fn initialize(
     Ok(())
 }
 
+#[derive(Accounts)]
+#[instruction(id: String)]
+pub struct Initialize<'info> {
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+    pub token_mint: Account<'info, Mint>,
+
+    #[account(
+        init,
+        payer=initializer, 
+        space = Controller::LEN,
+        seeds = [CONTROLLER_PDA_SEED.as_ref(), token_mint.key().as_ref(), id.as_ref()],
+        bump
+    )]
+    pub controller: Account<'info, Controller>,
+
+    #[account(
+        init, 
+        payer=initializer,
+        seeds=[ESCROW_PDA_SEED.as_ref(), token_mint.key().as_ref(), id.as_ref()],
+        bump,
+        token::mint=token_mint,
+        token::authority=controller,
+    )]
+    pub escrow: Account<'info, TokenAccount>,
+    
+    pub system_program: Program<'info, System>,
+    pub rent: Sysvar<'info, Rent>,
+    /// CHECK: This is not dangerous 
+    pub token_program: AccountInfo<'info>
+}
