@@ -15,6 +15,14 @@ pub const MAX_STRING_LEN: usize = 50;
 pub mod solana_swap_dapp {
     use super::*;
 
+    pub fn initialize(
+        ctx: Context<Initialize>, 
+        id: String,
+        token_price: Vec<u64>,
+        token_decimal: u8
+    ) -> Result<()> {
+        instructions::initialize::initialize(ctx, id, token_price, token_decimal)
+    }
 
 
 
