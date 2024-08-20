@@ -47,6 +47,20 @@ pub struct WithdrawEscrow<'info> {
     #[account(mut)]
     pub initializer: Signer<'info>,
 
+    #[account(
+       mut, 
+       has_one = initializer,
+       seeds = [CONTROLLER_PDA_SEED, controller.token_mint.as_ref(), controller.id.as_ref()], bump = controller.bump
+    )]
+    pub controller: Account<'info, Controller>,  
+    
+    #[account(
+        mut,
+        seeds = [ESCROW_PDA_SEED, controller.token_mint.as_ref(), controller.id.as_ref()], bump = controller.escrow_bump
+    )]
+    pub escrow: Account<'info, TokenAccount>,
+
+    #[account(
         mut
     )]
     pub initializer_token_account: Account<'info, TokenAccount>,
