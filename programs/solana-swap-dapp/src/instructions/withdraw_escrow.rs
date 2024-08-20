@@ -33,7 +33,21 @@ pub fn withdraw_escrow(
 
     let amount = escrow.amount;
     let cpi_ctx = CpiContext::new_with_signer(
-        token_pro
+        token_program.to_account_info(),
+        transfer_ix,
+        outer.as_slice()
+    );
+    anchor_spl::token::transfer(cpi_ctx, amount)?;
+    
+    Ok(())
+}
+
+#[derive(Accounts)]
+pub struct WithdrawEscrow<'info> {
+    #[account(mut)]
+    pub initializer: Signer<'info>,
+
+        mut
     )]
     pub initializer_token_account: Account<'info, TokenAccount>,
 
