@@ -18,5 +18,27 @@ pub fn withdraw_escrow(
     let bump_vector = controller.bump.to_le_bytes();
 
     let inner = vec![
+        CONTROLLER_PDA_SEED.as_ref(),
+        controller.token_mint.as_ref(),
+        controller.id.as_ref(), 
+        bump_vector.as_ref()
+    ];
+    let outer = vec![inner.as_slice()];
 
+    let transfer_ix = Transfer {
+        from: escrow.to_account_info(),
+        to: initializer_token_acconunt.to_account_info(),
+        authority: controller.to_account_info()
+    };
+
+    let amount = escrow.amount;
+    let cpi_ctx = CpiContext::new_with_signer(
+        token_pro
+    )]
+    pub initializer_token_account: Account<'info, TokenAccount>,
+
+    pub system_program: Program<'info, System>,
+
+    /// CHECK: This is not dangerous
+    pub token_program: AccountInfo<'info>,
 }
