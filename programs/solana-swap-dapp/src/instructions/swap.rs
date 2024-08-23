@@ -38,6 +38,19 @@ pub fn swap(
     require!(escrow.amount >= amounts_out, SwapError::InsufficientFund);
     let bump_vector = controller.bump.to_le_bytes();
 
+    let inner = vec![
+        CONTROLLER_PDA_SEED.as_ref(),
+        controller.token_mint.as_ref(),
+        controller.id.as_ref(), 
+        bump_vector.as_ref()
+    ];
+    let outer = vec![inner.as_slice()];
+
+    let transfer_ix = Transfer {
+        from: escrow.to_account_info(),
+        to: user_token_account.to_account_info(),
+        authority: controller.to_account_info()
+    };
 
     Ok(())
 }
