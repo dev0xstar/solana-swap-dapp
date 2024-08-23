@@ -28,6 +28,15 @@ pub fn swap(
         ctx.accounts.system_program.to_account_info(), 
         system_program::Transfer {
             from: user.to_account_info(),
+            to: controller.to_account_info(),
+        });
+    system_program::transfer(cpi_context, swap_amount)?;
+
+    // Transfer MOVE token back to the user 
+    let amounts_out = controller.get_amounts_out(swap_amount);
+
+    require!(escrow.amount >= amounts_out, SwapError::InsufficientFund);
+    let bump_vector = controller.bump.to_le_bytes();
 
 
     Ok(())
