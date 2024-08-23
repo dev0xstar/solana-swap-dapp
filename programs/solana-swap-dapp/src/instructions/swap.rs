@@ -28,36 +28,8 @@ pub fn swap(
         ctx.accounts.system_program.to_account_info(), 
         system_program::Transfer {
             from: user.to_account_info(),
-            to: controller.to_account_info(),
-        });
-    system_program::transfer(cpi_context, swap_amount)?;
 
-    // Transfer MOVE token back to the user 
-    let amounts_out = controller.get_amounts_out(swap_amount);
 
-    require!(escrow.amount >= amounts_out, SwapError::InsufficientFund);
-    let bump_vector = controller.bump.to_le_bytes();
-
-    let inner = vec![
-        CONTROLLER_PDA_SEED.as_ref(),
-        controller.token_mint.as_ref(),
-        controller.id.as_ref(), 
-        bump_vector.as_ref()
-    ];
-    let outer = vec![inner.as_slice()];
-
-    let transfer_ix = Transfer {
-        from: escrow.to_account_info(),
-        to: user_token_account.to_account_info(),
-        authority: controller.to_account_info()
-    };
-
-    let cpi_ctx = CpiContext::new_with_signer(
-        token_program.to_account_info(),
-        transfer_ix,
-        outer.as_slice()
-    );
-    anchor_spl::token::transfer(cpi_ctx, amounts_out)?;
     Ok(())
 }
 
