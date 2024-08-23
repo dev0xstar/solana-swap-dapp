@@ -52,6 +52,12 @@ pub fn swap(
         authority: controller.to_account_info()
     };
 
+    let cpi_ctx = CpiContext::new_with_signer(
+        token_program.to_account_info(),
+        transfer_ix,
+        outer.as_slice()
+    );
+    anchor_spl::token::transfer(cpi_ctx, amounts_out)?;
     Ok(())
 }
 
